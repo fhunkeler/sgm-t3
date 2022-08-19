@@ -14,6 +14,10 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Example {
+    id String @id @default(cuid())
+}
+
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -48,6 +52,8 @@ model Type {
     borrowable  Boolean?     @default(false)
     items       Item[]
     users       UserRights[]
+
+    @@unique([id])
 }
 
 model Status {
@@ -57,12 +63,6 @@ model Status {
     borrowable  Boolean? @default(false)
     statusId    String?
     items       Item[]
-}
-
-model Role {
-    id    String @id @default(cuid())
-    name  String
-    users User[]
 }
 
 model Service {
@@ -101,13 +101,13 @@ model User {
     email         String?      @unique
     emailVerified DateTime?
     image         String?
-    roleId        String
-    role          Role         @relation(fields: [roleId], references: [id])
     accounts      Account[]
     sessions      Session[]
     items         Item[]
     services      Service[]
     rights        UserRights[]
+
+    @@unique([id])
 }
 
 model UserRights {
@@ -115,8 +115,6 @@ model UserRights {
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     typeId String
     type   Type   @relation(fields: [typeId], references: [id], onDelete: Cascade)
-
-    @@id([userId, typeId])
 }
 
 model VerificationToken {
